@@ -16,6 +16,10 @@ public class RegisterValidator {
     private static final int MIN_PASS_LENGTH = 8;
     private static final int MAX_PASS_LENGTH = 30;
 
+    private RegisterValidator() {
+
+    }
+
     public static boolean isAgeCorrect(LocalDate birthday) {
 
         if(birthday == null) {
@@ -25,7 +29,7 @@ public class RegisterValidator {
         LocalDate lastDateAllowed = LocalDate.now().minusYears(MIN_AGE);
         LocalDate firstDateAllowed = LocalDate.now().minusYears(MAX_AGE);
 
-        return birthday.isBefore(lastDateAllowed) && birthday.isAfter(firstDateAllowed);
+        return birthday.isEqual(firstDateAllowed) || birthday.isEqual(lastDateAllowed) || (birthday.isBefore(lastDateAllowed) && birthday.isAfter(firstDateAllowed));
     }
 
     public static boolean isNameFormatCorrect(String firstName, String lastName) {
