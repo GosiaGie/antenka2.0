@@ -1,0 +1,18 @@
+package pl.volleylove.antenka;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+
+@SpringBootApplication
+@EnableJpaRepositories("pl.volleylove.antenka.repository")
+public class AntenkaApplication {
+
+	public static void main(String[] args) {
+
+		SpringApplication.run(AntenkaApplication.class, args);
+
+	}
+
+}
