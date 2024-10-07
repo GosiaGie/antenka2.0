@@ -51,7 +51,7 @@ public class RegisterValidator {
             return false;
         }
 
-        Pattern pattern = Pattern.compile("^[\\w-.]+@([\\w-])+[.][\\w-]{2,4}$");
+        Pattern pattern = Pattern.compile("^[\\w-.]{2,50}@([\\w-])+[.][\\w-]{2,4}$");
         Matcher matcher = pattern.matcher(email);
 
         return matcher.matches();
