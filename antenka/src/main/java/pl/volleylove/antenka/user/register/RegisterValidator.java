@@ -22,7 +22,7 @@ public class RegisterValidator {
 
     public static boolean isAgeCorrect(LocalDate birthday) {
 
-        if(birthday == null) {
+        if (birthday == null) {
             return false;
         }
 
@@ -34,7 +34,7 @@ public class RegisterValidator {
 
     public static boolean isNameFormatCorrect(String firstName, String lastName) {
 
-        if(firstName == null || lastName ==null) {
+        if (firstName == null || lastName == null) {
             return false;
         }
 
@@ -47,7 +47,7 @@ public class RegisterValidator {
 
     public static boolean isEmailFormatCorrect(String email) {
 
-        if(email == null) {
+        if (email == null) {
             return false;
         }
 
@@ -60,6 +60,10 @@ public class RegisterValidator {
 
 
     public static boolean isPasswordFormatCorrect(String password) {
+
+        if (password == null) {
+            return false;
+        }
 
         Pattern letters = Pattern.compile("[a-zA-Z]");
         Pattern digit = Pattern.compile("\\d");
