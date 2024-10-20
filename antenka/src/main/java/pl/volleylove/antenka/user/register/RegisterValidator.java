@@ -32,15 +32,15 @@ public class RegisterValidator {
         return birthday.isEqual(firstDateAllowed) || birthday.isEqual(lastDateAllowed) || (birthday.isBefore(lastDateAllowed) && birthday.isAfter(firstDateAllowed));
     }
 
-    public static boolean isNameFormatCorrect(String firstName, String lastName) {
+    //method for first name and last name
+    public static boolean isNameFormatCorrect(String name) {
 
-        if (firstName == null || lastName == null) {
+        if (name == null) {
             return false;
         }
 
-        return firstName.chars().allMatch(Character::isLetter) && lastName.chars().allMatch(Character::isLetter)
-                && firstName.length() >= MIN_NAME_LENGTH && firstName.length() <= MAX_NAME_LENGTH
-                && lastName.length() >= MIN_NAME_LENGTH && lastName.length() <= MAX_NAME_LENGTH;
+        return name.chars().allMatch(Character::isLetter)
+                && name.length() >= MIN_NAME_LENGTH && name.length() <= MAX_NAME_LENGTH;
 
     }
 
