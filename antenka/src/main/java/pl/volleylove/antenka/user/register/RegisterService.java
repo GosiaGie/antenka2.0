@@ -10,6 +10,8 @@ import pl.volleylove.antenka.user.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 @Service
 public class RegisterService {
@@ -27,9 +29,8 @@ public class RegisterService {
 
     public RegisterResponse register(RegisterRequest registerRequest) {
 
-        //checking if request is null
-        if (registerRequest == null || registerRequest.getEmail() == null) {
-
+        //checking if request or any field of it is null
+        if (isNullOrHasNull(registerRequest)) {
             return RegisterResponse.builder()
                     .registerInfo(List.of(RegisterInfo.MISSING_INFO))
                     .build();
@@ -76,8 +77,11 @@ public class RegisterService {
 
         List<RegisterInfo> validateInfo = new ArrayList<>();
 
-        if (!RegisterValidator.isNameFormatCorrect(request.getFirstName(), request.getLastName())) {
-            validateInfo.add(RegisterInfo.INCORRECT_NAME);
+        if (!RegisterValidator.isNameFormatCorrect(request.getFirstName())) {
+            validateInfo.add(RegisterInfo.INCORRECT_FIRST_NAME);
+        }
+        if (!RegisterValidator.isNameFormatCorrect(request.getLastName())) {
+            validateInfo.add(RegisterInfo.INCORRECT_LAST_NAME);
         }
         if (!RegisterValidator.isEmailFormatCorrect(request.getEmail())) {
             validateInfo.add(RegisterInfo.INCORRECT_EMAIL);
@@ -90,6 +94,16 @@ public class RegisterService {
         }
 
         return validateInfo;
+    }
+
+    private boolean isNullOrHasNull(RegisterRequest request) {
+
+        if (request == null) {
+            return true;
+        }
+
+        return Stream.of(request.getFirstName(), request.getLastName(), request.getEmail(), request.getPassword(), request.getBirthday())
+                    .anyMatch(Objects::isNull);
     }
 
 }
