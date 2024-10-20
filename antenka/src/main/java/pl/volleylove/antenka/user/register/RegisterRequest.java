@@ -1,14 +1,16 @@
 package pl.volleylove.antenka.user.register;
 
-import com.sun.istack.NotNull;
-import lombok.Builder;
-import lombok.Getter;
+
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 import java.time.LocalDate;
 
 
 @Getter
+@Setter
 @Builder
+@AllArgsConstructor
 public class RegisterRequest {
 
     @NotNull
