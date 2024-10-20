@@ -7,8 +7,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import pl.volleylove.antenka.map.GoogleMapsApiHelper;
 import pl.volleylove.antenka.map.GoogleMapsApiProperties;
 import pl.volleylove.antenka.security.*;
-import pl.volleylove.antenka.user.UserService;
-import pl.volleylove.antenka.user.register.RegisterValidator;
 
 @Configuration
 public class BeanConfiguration {
