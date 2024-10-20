@@ -1,72 +1,121 @@
 package pl.volleylove.antenka.user.register;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.stream.Stream;
 
-@RunWith(JUnitParamsRunner.class)
-public class RegisterValidatorTest {
-    @Test
-    @Parameters({"2, false", "-2, false", "0, false", "20, true", "100, true", "150, true", "16, true", "0, false"})
-    public void isAgeCorrectTestPastDates(int age, boolean expected) {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-        //current requirements - min: 16, max: 150
-        Assert.assertEquals(expected, RegisterValidator.isAgeCorrect(LocalDate.now().minusYears(age)));
+@ExtendWith(MockitoExtension.class)
+class RegisterValidatorTest {
+
+    //isAgeCorrect() tests
+    //current requirements - min: 16, max: 150
+    private static Stream<Arguments> provideAge() {
+        return Stream.of(
+                Arguments.of(16, true),
+                Arguments.of(15, false),
+                Arguments.of(150, true),
+                Arguments.of(151, false),
+                Arguments.of(30, true),
+                Arguments.of(-30, false),
+                Arguments.of(0, false),
+                Arguments.of(1000, false),
+                Arguments.of(-1000, false)
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("provideAge")
+    void isAgeCorrectTest(int age, boolean expected) {
+
+        //passing negative values results future data
+        assertEquals(expected, RegisterValidator.isAgeCorrect(LocalDate.now().minusYears(age)));
+
+    }
+
+    //isNameFormatCorrect() tests
+    //3 is minimum length, 20 is max
+    private static Stream<Arguments> provideNames() {
+        return Stream.of(
+                Arguments.of("abc", true),
+                Arguments.of( "ab1%343#", false),
+                Arguments.of("ab", false),
+                Arguments.of("dawerdfghtrfgrhgfdcf", true), //max lenght
+                Arguments.of("tooooooooooloooooooog", false)
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("provideNames")
+    void isNameFormatCorrectTest(String name, boolean expected) {
+
+        assertEquals(expected, RegisterValidator.isNameFormatCorrect(name));
+
+    }
+
+    //isNameFormatCorrect() tests
+    //3 is minimum length, 20 is max
+    private static Stream<Arguments> provideEmails() {
+        return Stream.of(
+                Arguments.of("abc", false),
+                Arguments.of( "userwp.pl", false),
+                Arguments.of("user@wp.pl", true),
+                Arguments.of("ab", "ab", false),
+                Arguments.of("%$#gosia@wp.pl", false),
+                Arguments.of("gosia@wppl", false),
+                Arguments.of("gosia123@wp.pl", true),
+                Arguments.of( "              ", false),
+                Arguments.of("aschshshenansnfnesnrnenjklodasqwerthgjfmikmgkpgfds@wp.pl", true), //max length of a local part - 50),
+                Arguments.of("aschshshenansnfnesnrnenjklodasqwerthgjfmikmgkpgfdsaaaaaaaaaa@wp.pl", false), //max length of a local part - 50),
+                Arguments.of("asca@wp.plplplplplplp", false)
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("provideEmails")
+    void isEmailFormatCorrectTest(String email, boolean expected) {
+
+        assertEquals(expected, RegisterValidator.isEmailFormatCorrect(email));
+
+    }
+
+
+    //isPasswordFormatCorrect() tests
+    private static Stream<Arguments> providePasswords() {
+        return Stream.of(
+                Arguments.of("abc", false),
+                Arguments.of( "ab!abd", false),
+                Arguments.of("dsad!sdsdsdas", false),
+                Arguments.of("   ", false),
+                Arguments.of("dfadw!4dsa", true),
+                Arguments.of("!4#@#$@$@!#$!@$", false),
+                Arguments.of( "              ", false),
+                Arguments.of("a!3fdjklpolfgjklomngtrhbgnmlkopf", false)
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("providePasswords")
+    void isPasswordFormatCorrectTest(String password, boolean expected) {
+
+        assertEquals(expected, RegisterValidator.isPasswordFormatCorrect(password));
 
     }
 
     @Test
-    @Parameters({"2", "1000", "0"})
-    public void isAgeCorrectTestFutureDates(int age) {
+    void registerValidatorMethodsGetNull() {
+        assertFalse(RegisterValidator.isAgeCorrect(null));
 
-        Assert.assertFalse(RegisterValidator.isAgeCorrect(LocalDate.now().plusYears(age)));
+        assertFalse(RegisterValidator.isNameFormatCorrect(null));
 
-    }
+        assertFalse(RegisterValidator.isEmailFormatCorrect(null));
 
-    @Test
-    @Parameters({"abc, abc, true", "ab1%343#, abd, false" , "dddadse, !^abc4, false", "ab, ab, false", "ab, ab, false", "abc, abc, true",
-    "abcabcabcabcabcabcab, abcabcabcabcabcabcab, true", ", , false"})
-    public void isNameFormatCorrect(String firstName, String lastName, boolean expected) {
-
-        Assert.assertEquals(expected, RegisterValidator.isNameFormatCorrect(firstName, lastName));
-
-    }
-
-    @Test
-    @Parameters({"abc, false", "gosiawp.pl, false", "gosia@wp.pl, true", "%$#gosia@wp.pl, false", "gosia@wppl, false",
-            "gosia123@wp.pl, true", " , false", "aschshshenansnfnesnrnenjklodasqwerthgjfmikmgkpgfds@wp.pl, true", //max length of a local part - 50
-            "aschshshenansnfnesnrnenjklodasqwerthgjfmikmgkpgfdsaaaaaaaaaa@wp.pl, false"}) //length of a local part is over the limit
-    public void isEmailFormatCorrect(String email, boolean expected) {
-
-        Assert.assertEquals(expected, RegisterValidator.isEmailFormatCorrect(email));
-
-    }
-
-
-    @Test
-    @Parameters({"abc, false", "ab!abd, false", "dsad!sdsdsdas, false", ",false", "dfadw!4dsa, true",
-            "!4#@#$@$@!#$!@$, false", "!3fdjklpolfgjklomngtrhbgnmlkopf, false"}) //too long
-    public void isPasswordFormatCorrect(String password, boolean expected) {
-
-        Assert.assertEquals(expected, RegisterValidator.isPasswordFormatCorrect(password));
-
-    }
-
-    @Test
-    public void registerValidatorMethodsGetNull() {
-        Assert.assertFalse(RegisterValidator.isAgeCorrect(null));
-
-        Assert.assertFalse(RegisterValidator.isNameFormatCorrect(null, "surname"));
-        Assert.assertFalse(RegisterValidator.isNameFormatCorrect("firstname", null));
-        Assert.assertFalse(RegisterValidator.isNameFormatCorrect(null, null));
-
-        Assert.assertFalse(RegisterValidator.isEmailFormatCorrect(null));
-
-        Assert.assertFalse(RegisterValidator.isPasswordFormatCorrect(null));
+        assertFalse(RegisterValidator.isPasswordFormatCorrect(null));
 
     }
 
