@@ -13,30 +13,40 @@ public class BeanConfiguration {
 
     @Bean
     public JwtIssuer jwtIssuer() {
-        return new JwtIssuer(new JwtProperties());
+        return new JwtIssuer(properties());
     }
 
     @Bean
-    public JwtDecoder jwtDecoder(){return new JwtDecoder(new JwtProperties());};
+    public JwtProperties properties() {
+        return new JwtProperties();
+    }
 
     @Bean
-    public JwtToPrincipalConverter jwtToPrincipalConverter(){return new JwtToPrincipalConverter();}
+    public JwtDecoder jwtDecoder() {
+        return new JwtDecoder(new JwtProperties());
+    }
+
+    ;
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(){
-        return new JwtAuthenticationFilter(jwtDecoder(), jwtToPrincipalConverter());}
+    public JwtToPrincipalConverter jwtToPrincipalConverter() {
+        return new JwtToPrincipalConverter();
+    }
 
     @Bean
-    public PasswordEncoder passwordEncoderForService(){return new BCryptPasswordEncoder();}
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtDecoder(), jwtToPrincipalConverter());
+    }
 
     @Bean
-    public GoogleMapsApiHelper googleMapsHelper(){return new GoogleMapsApiHelper(new GoogleMapsApiProperties());}
+    public PasswordEncoder passwordEncoderForService() {
+        return new BCryptPasswordEncoder();
+    }
 
-
-
-
-
-
+    @Bean
+    public GoogleMapsApiHelper googleMapsHelper() {
+        return new GoogleMapsApiHelper(new GoogleMapsApiProperties());
+    }
 
 
 }
