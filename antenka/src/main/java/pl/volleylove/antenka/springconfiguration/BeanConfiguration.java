@@ -26,8 +26,6 @@ public class BeanConfiguration {
         return new JwtDecoder(new JwtProperties());
     }
 
-    ;
-
     @Bean
     public JwtToPrincipalConverter jwtToPrincipalConverter() {
         return new JwtToPrincipalConverter();
