@@ -24,7 +24,6 @@ public class DeleteAccountService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 
-
         if(email.equals(userPrincipal.getEmail())) {
             User user = User.builder().userID(userPrincipal.getUserID()).build();
             userRepository.delete(user);
