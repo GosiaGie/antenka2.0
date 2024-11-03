@@ -27,7 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AuthServiceClassTest {
+class AuthServiceTest {
 
     private static final long ID = 123456789L;
     private static final String TOKEN = "123456789";
