@@ -23,7 +23,7 @@ public class BeanConfiguration {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return new JwtDecoder(new JwtProperties());
+        return new JwtDecoder(properties());
     }
 
     @Bean
