@@ -83,7 +83,7 @@ class RegisterServiceTest {
     }
 
     @Test
-    void requestIsNullTest() {
+    void registerTestRequestIsNullTest() {
 
         RegisterResponse expected = new RegisterResponse(null, List.of(RegisterInfo.MISSING_INFO));
 
