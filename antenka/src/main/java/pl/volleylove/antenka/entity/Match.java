@@ -4,16 +4,15 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity(name = "match")
 @Table(name = "matches")
-@ToString
 @OnDelete(action = OnDeleteAction.CASCADE)
 @SuperBuilder
 @Getter
@@ -47,5 +46,12 @@ public class Match extends Event {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), dateTime);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + "Match{" +
+                "dateTime=" + dateTime +
+                '}';
     }
 }
