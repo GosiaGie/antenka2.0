@@ -43,7 +43,7 @@ public class AuthService {
 
     public Long getAuthenticatedUserID(){
 
-        Authentication authentication =  SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         return ((UserPrincipal) authentication.getPrincipal()).getUserID();
 
