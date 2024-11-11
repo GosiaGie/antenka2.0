@@ -5,10 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import pl.volleylove.antenka.entity.*;
-import pl.volleylove.antenka.enums.AddressType;
-import pl.volleylove.antenka.enums.FindMatchInfo;
-import pl.volleylove.antenka.enums.SignUpInfo;
-import pl.volleylove.antenka.enums.SigningUpEndReason;
+import pl.volleylove.antenka.enums.*;
 import pl.volleylove.antenka.event.PlayerWanted;
 import pl.volleylove.antenka.event.match.add.AddMatchRequest;
 import pl.volleylove.antenka.event.match.add.AddMatchResponse;
@@ -72,9 +69,15 @@ public class MatchService {
 
         //1. getting authenticated userID
         Long authenticatedUserID = authService.getAuthenticatedUserID();
-
         //2. after getting userID, we find user and set her/him as organizer
-        User userOrganizer = userService.findByID(authenticatedUserID).orElseThrow();
+        User userOrganizer;
+        try {
+            userOrganizer = userService.findByID(authenticatedUserID).orElseThrow();
+        } catch (NoSuchElementException e) {
+            return AddMatchResponse.builder()
+                    .addMatchInfo(List.of("USER_NOT_FOUND"))
+                    .build();
+        }
 
         //3. finding geo data and address type
         Address address = locationService.setLocationInAddress(request.getAddress());
