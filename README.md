@@ -28,7 +28,7 @@ POST /auth/register
 ```json
 {
   "email" : "jan.kowalski@mail.com",
-  "password" : "ILoveCatsAndDogs1!",
+  "password" : "SuperPassword1!",
   "firstName" : "Jan",
   "lastName" : "Kowalski",
   "birthday" : "2000-01-01"
