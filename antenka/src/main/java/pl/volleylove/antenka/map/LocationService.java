@@ -1,7 +1,6 @@
 package pl.volleylove.antenka.map;
 
 import eu.dattri.jsonbodyhandler.JsonBodyHandler;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
@@ -12,12 +11,11 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 
-@RequiredArgsConstructor
 @ConfigurationProperties("google.maps")
 @Service
 public class LocationService {
 
-    GoogleMapsApiHelper googleMapsApiHelper;
+    private final GoogleMapsApiHelper googleMapsApiHelper;
 
     @Autowired
     public LocationService(GoogleMapsApiHelper googleMapsApiHelper) {
