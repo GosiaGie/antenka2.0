@@ -29,9 +29,9 @@ POST /auth/register
 {
   "email" : "m.galat@rocketmail.com",
   "password" : "ILoveCatsAndDogs1!",
-  "firstName" : "Malgorzata",
-  "lastName" : "Galat",
-  "birthday" : "1993-03-13"
+  "firstName" : "Jan",
+  "lastName" : "Kowalski",
+  "birthday" : "2000-01-01"
 }
 ```
 
