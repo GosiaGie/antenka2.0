@@ -90,7 +90,7 @@ After successful login API returns JWT - `accessToken`. Response with http code 
 Successful login example:
 ```json
 {
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3NSIsImV4cCI6MTcwMGOSIAc1MSwiZW1haWwiOiJnb3NpYWdhbGF0QHdwLnBsIiwicm9sZXMiOlsiUk9MRV9VU0VSIl19.KvGOSIAptjF7xau6uWvU6RDgnovT-jf0KEq7PuwXs_g"
+    "accessToken": "token_here"
 }
 ```
 
