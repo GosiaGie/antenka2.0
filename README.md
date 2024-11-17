@@ -256,17 +256,18 @@ Example of a successful adding player's profile:
 {
     "info": "OK",
     "playerProfile": {
+        "playerProfileID": 2,
         "positions": [
-            "RIGHT_SIDE_HITTER",
-            "SETTER"
+            "SETTER",
+            "RIGHT_SIDE_HITTER"
         ],
         "level": "MEDIUM",
         "gender": "FEMALE",
         "benefitCardNumber": "12345",
-        "matchApps": null,
-        "age": 0,
-        "activeBenefit": false,
-        "id": 14
+        "apps": [],
+        "age": 31,
+        "activeBenefit": true,
+        "signedUpForActiveEvent": false
     }
 }
 ```
