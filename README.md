@@ -107,7 +107,7 @@ Other requirements (age, gender, level) can be the same or different.
 
 
 ```http
-POST /add
+POST /addMatch
 ```
 
 ```json
