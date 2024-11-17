@@ -42,9 +42,9 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public GoogleMapsApiHelper googleMapsHelper() {
-        return new GoogleMapsApiHelper(new GoogleMapsApiProperties());
-    }
+    public GoogleMapsApiHelper googleMapsHelper() {return new GoogleMapsApiHelper(googleMapsApiProperties());}
 
+    @Bean
+    public GoogleMapsApiProperties googleMapsApiProperties() { return new GoogleMapsApiProperties();}
 
 }
