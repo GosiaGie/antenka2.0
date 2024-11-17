@@ -48,7 +48,7 @@ POST /auth/register
 Example of a successful registration response:
 ```json
 {
-    "email": "m.galat@rocketmail.com",
+    "email": "jan.kowalski@mail.com",
     "registerInfo": [
         "OK"
     ]
@@ -58,7 +58,7 @@ Example of a successful registration response:
 Example of a unsuccessful registration response:
 ```json
 {
-    "email": "m.galat@rocketmail.com",
+    "email": "jan.kowalski@mail.com",
     "registerInfo": [
         "PASSWORD_DOES_NOT_MEET_REQ",
         "EMAIL_ALREADY_EXISTS",
@@ -81,8 +81,8 @@ POST /auth/login
 
 ```json
 {
-    "email": "m.galat@rocketmail.com",
-    "password": "ILoveCatsAndDogs1!"
+    "email": "jan.kowalski@mail.com",
+    "password": "SuperPassword1!"
 }
 ```
 ### Response
