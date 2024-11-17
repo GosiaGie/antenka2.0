@@ -25,7 +25,7 @@ public class AddMatchRequest {
     private static final int NAME_MAX_LENGTH = 30;
 
     @NotNull
-    @Size(min = NAME_MIN_LENGTH, max = NAME_MIN_LENGTH, message = "Name has to contain from "
+    @Size(min = NAME_MIN_LENGTH, max = NAME_MAX_LENGTH, message = "Name has to contain from "
             + NAME_MIN_LENGTH  + " to " + NAME_MAX_LENGTH + " characters")
     private String name;
     private LocalDateTime dateTime;
