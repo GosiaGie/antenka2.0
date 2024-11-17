@@ -142,40 +142,12 @@ Example of a successful adding a `Match`:
         "OK"
     ],
     "match": {
-        "eventID": 184,
-        "name": "Warszawski Mecz Charytatywny",
-        "dateTime": "2024-04-23T18:00:00",
-        "price": {
-            "regularPrice": 20,
-            "benefitPrice": 10
-        },
-        "address": {
-            "addressID": 186,
-            "addressType": "EVENT",
-            "street": "adolfapawińskiego",
-            "number": "2",
-            "flatNumber": null,
-            "zipCode": "02106",
-            "locality": "Warsaw",
-            "location": {
-                "lat": 52.20978179999999,
-                "lng": 20.9800504
-            },
-            "description": "Hala"
-        },
-        "closeReason": null,
-        "playersNum": 2,
-        "freeSlots": 2,
-        "open": true,
+        "eventID": 5,
         "slots": [
             {
-                "id": 109,
-                "match": {
-                    "eventID": 184,
-                    "name": null,
-                    "dateTime": null,
-                    "price": null,
-                    "address": null
+                "id": 9,
+                "event": {
+                    "eventID": 5
                 },
                 "orderNum": 1,
                 "playerWanted": {
@@ -190,13 +162,9 @@ Example of a successful adding a `Match`:
                 "playerApplied": null
             },
             {
-                "id": 110,
-                "match": {
-                    "eventID": 184,
-                    "name": null,
-                    "dateTime": null,
-                    "price": null,
-                    "address": null
+                "id": 10,
+                "event": {
+                    "eventID": 5
                 },
                 "orderNum": 2,
                 "playerWanted": {
@@ -210,7 +178,32 @@ Example of a successful adding a `Match`:
                 },
                 "playerApplied": null
             }
-        ]
+        ],
+        "name": "Warszawski Mecz Charytatywny",
+        "price": {
+            "regularPrice": 20,
+            "benefitPrice": 10
+        },
+        "address": {
+            "addressID": 5,
+            "addressType": "EVENT",
+            "street": "AdolfaPawińskiego",
+            "number": "2",
+            "flatNumber": null,
+            "zipCode": "02106",
+            "locality": "Warsaw",
+            "location": {
+                "lat": 52.20978179999999,
+                "lng": 20.9800504
+            },
+            "description": "Hala"
+        },
+        "freeSlots": 2,
+        "playersNum": 2,
+        "signingUpEndReason": null,
+        "dateTime": "2024-11-23T18:00:00",
+        "active": true,
+        "signingUp": true
     }
 }
 ```
