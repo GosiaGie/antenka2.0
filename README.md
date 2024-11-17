@@ -27,11 +27,11 @@ POST /auth/register
 
 ```json
 {
-  "email" : "m.galat@rocketmail.com",
-  "password" : "ILoveCatsAndDogs1!",
-  "firstName" : "Malgorzata",
-  "lastName" : "Galat",
-  "birthday" : "1993-03-13"
+  "email" : "jan.kowalski@mail.com",
+  "password" : "SuperPassword1!",
+  "firstName" : "Jan",
+  "lastName" : "Kowalski",
+  "birthday" : "2000-01-01"
 }
 ```
 
@@ -48,7 +48,7 @@ POST /auth/register
 Example of a successful registration response:
 ```json
 {
-    "email": "m.galat@rocketmail.com",
+    "email": "jan.kowalski@mail.com",
     "registerInfo": [
         "OK"
     ]
@@ -58,7 +58,7 @@ Example of a successful registration response:
 Example of a unsuccessful registration response:
 ```json
 {
-    "email": "m.galat@rocketmail.com",
+    "email": "jan.kowalski@mail.com",
     "registerInfo": [
         "PASSWORD_DOES_NOT_MEET_REQ",
         "EMAIL_ALREADY_EXISTS",
@@ -81,8 +81,8 @@ POST /auth/login
 
 ```json
 {
-    "email": "m.galat@rocketmail.com",
-    "password": "ILoveCatsAndDogs1!"
+    "email": "jan.kowalski@mail.com",
+    "password": "SuperPassword1!"
 }
 ```
 ### Response
@@ -90,7 +90,7 @@ After successful login API returns JWT - `accessToken`. Response with http code 
 Successful login example:
 ```json
 {
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3NSIsImV4cCI6MTcwMGOSIAc1MSwiZW1haWwiOiJnb3NpYWdhbGF0QHdwLnBsIiwicm9sZXMiOlsiUk9MRV9VU0VSIl19.KvGOSIAptjF7xau6uWvU6RDgnovT-jf0KEq7PuwXs_g"
+    "accessToken": "token_here"
 }
 ```
 
@@ -107,7 +107,7 @@ Other requirements (age, gender, level) can be the same or different.
 
 
 ```http
-POST /add
+POST /addMatch
 ```
 
 ```json
@@ -142,40 +142,12 @@ Example of a successful adding a `Match`:
         "OK"
     ],
     "match": {
-        "eventID": 184,
-        "name": "Warszawski Mecz Charytatywny",
-        "dateTime": "2024-04-23T18:00:00",
-        "price": {
-            "regularPrice": 20,
-            "benefitPrice": 10
-        },
-        "address": {
-            "addressID": 186,
-            "addressType": "EVENT",
-            "street": "adolfapawińskiego",
-            "number": "2",
-            "flatNumber": null,
-            "zipCode": "02106",
-            "locality": "Warsaw",
-            "location": {
-                "lat": 52.20978179999999,
-                "lng": 20.9800504
-            },
-            "description": "Hala"
-        },
-        "closeReason": null,
-        "playersNum": 2,
-        "freeSlots": 2,
-        "open": true,
+        "eventID": 5,
         "slots": [
             {
-                "id": 109,
-                "match": {
-                    "eventID": 184,
-                    "name": null,
-                    "dateTime": null,
-                    "price": null,
-                    "address": null
+                "id": 9,
+                "event": {
+                    "eventID": 5
                 },
                 "orderNum": 1,
                 "playerWanted": {
@@ -190,13 +162,9 @@ Example of a successful adding a `Match`:
                 "playerApplied": null
             },
             {
-                "id": 110,
-                "match": {
-                    "eventID": 184,
-                    "name": null,
-                    "dateTime": null,
-                    "price": null,
-                    "address": null
+                "id": 10,
+                "event": {
+                    "eventID": 5
                 },
                 "orderNum": 2,
                 "playerWanted": {
@@ -210,7 +178,32 @@ Example of a successful adding a `Match`:
                 },
                 "playerApplied": null
             }
-        ]
+        ],
+        "name": "Warszawski Mecz Charytatywny",
+        "price": {
+            "regularPrice": 20,
+            "benefitPrice": 10
+        },
+        "address": {
+            "addressID": 5,
+            "addressType": "EVENT",
+            "street": "AdolfaPawińskiego",
+            "number": "2",
+            "flatNumber": null,
+            "zipCode": "02106",
+            "locality": "Warsaw",
+            "location": {
+                "lat": 52.20978179999999,
+                "lng": 20.9800504
+            },
+            "description": "Hala"
+        },
+        "freeSlots": 2,
+        "playersNum": 2,
+        "signingUpEndReason": null,
+        "dateTime": "2024-11-23T18:00:00",
+        "active": true,
+        "signingUp": true
     }
 }
 ```
@@ -263,17 +256,18 @@ Example of a successful adding player's profile:
 {
     "info": "OK",
     "playerProfile": {
+        "playerProfileID": 2,
         "positions": [
-            "RIGHT_SIDE_HITTER",
-            "SETTER"
+            "SETTER",
+            "RIGHT_SIDE_HITTER"
         ],
         "level": "MEDIUM",
         "gender": "FEMALE",
         "benefitCardNumber": "12345",
-        "matchApps": null,
-        "age": 0,
-        "activeBenefit": false,
-        "id": 14
+        "apps": [],
+        "age": 31,
+        "activeBenefit": true,
+        "signedUpForActiveEvent": false
     }
 }
 ```
