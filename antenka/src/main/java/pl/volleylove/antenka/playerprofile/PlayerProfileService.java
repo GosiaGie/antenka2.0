@@ -57,7 +57,8 @@ public class PlayerProfileService {
                     .build();
         }
 
-        if (!benefitService.isCorrect(request.getBenefitCardNumber())) {
+        //if request has BenefitCardNumber, then check if it's correct
+        if (request.getBenefitCardNumber() != null && !benefitService.isCorrect(request.getBenefitCardNumber())) {
             return PlayerProfileResponse.builder()
                     .info(PlayerProfileInfo.INCORRECT_BENEFIT_NUMBER)
                     .build();
@@ -107,7 +108,7 @@ public class PlayerProfileService {
 
         //getting user's profile
         Optional<User> userResult = userService.findByID(authService.getAuthenticatedUserID());
-        if(userResult.isEmpty()) {
+        if (userResult.isEmpty()) {
             throw new NotAuthenticatedException("User not logged in");
         }
 
@@ -127,6 +128,5 @@ public class PlayerProfileService {
         return profile.getApps().stream().anyMatch(
                 slot -> slot.getEvent().isActive());
     }
-
 
 }
