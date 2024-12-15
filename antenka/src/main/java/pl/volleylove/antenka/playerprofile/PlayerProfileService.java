@@ -20,13 +20,13 @@ import java.util.Optional;
 @Service
 public class PlayerProfileService {
 
-    private PlayerProfileRepository playerProfileRepository;
+    private final PlayerProfileRepository playerProfileRepository;
 
-    private AuthService authService;
+    private final AuthService authService;
 
-    private UserService userService;
+    private final UserService userService;
 
-    private BenefitService benefitService;
+    private final BenefitService benefitService;
 
 
     @Autowired
