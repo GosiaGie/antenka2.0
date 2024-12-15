@@ -14,6 +14,7 @@ import pl.volleylove.antenka.user.auth.AuthService;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 @Service
@@ -68,6 +69,8 @@ public class PlayerProfileService {
         playerProfile.setLevel(request.getLevel());
         playerProfile.setGender(request.getGender());
         playerProfile.setBenefitCardNumber(request.getBenefitCardNumber());
+        playerProfile.setActiveBenefit(benefitService.isActive(request.getBenefitCardNumber()));
+        playerProfile.setAge((int) ChronoUnit.YEARS.between(userResult.get().getBirthday(), LocalDate.now()));
 
 
         return PlayerProfileResponse.builder()
