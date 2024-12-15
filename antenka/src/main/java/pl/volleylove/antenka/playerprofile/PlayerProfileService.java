@@ -70,7 +70,7 @@ public class PlayerProfileService {
         playerProfile.setLevel(request.getLevel());
         playerProfile.setGender(request.getGender());
         playerProfile.setBenefitCardNumber(request.getBenefitCardNumber());
-        playerProfile.setActiveBenefit(benefitService.isActive(request.getBenefitCardNumber()));
+        playerProfile.setActiveBenefit(request.getBenefitCardNumber() != null && benefitService.isActive(request.getBenefitCardNumber()));
         playerProfile.setAge((int) ChronoUnit.YEARS.between(userResult.get().getBirthday(), LocalDate.now()));
 
 
@@ -124,7 +124,7 @@ public class PlayerProfileService {
         return playerProfile;
     }
 
-    public boolean isPlayerSignedUpForActiveEvent(PlayerProfile profile) {
+    public static boolean isPlayerSignedUpForActiveEvent(PlayerProfile profile) {
         return profile.getApps().stream().anyMatch(
                 slot -> slot.getEvent().isActive());
     }
