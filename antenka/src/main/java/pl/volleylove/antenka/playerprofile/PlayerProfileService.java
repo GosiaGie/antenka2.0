@@ -79,7 +79,7 @@ public class PlayerProfileService {
                 .build();
     }
 
-    public int calculateAge(LocalDate birthDate) {
+    public static int calculateAge(LocalDate birthDate) {
 
         LocalDate currentDate = LocalDate.now();
 
