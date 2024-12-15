@@ -50,22 +50,17 @@ public class PlayerProfileService {
         //getting player's profile - if exists, otherwise creating new player's profile
         Optional<PlayerProfile> playerProfileResult = getPlayerProfile(userResult.get());
 
-        //if user has PlayerProfile, then check:
-        if (playerProfileResult.isPresent()) {
-            //if is signed up for an event, so can't change his/her PlayerProfile
-            if (isPlayerSignedUpForActiveEvent(playerProfileResult.get())) {
-                return PlayerProfileResponse.builder()
-                        .info(PlayerProfileInfo.YOU_ARE_SIGNED_UP_FOR_EVENT)
-                        .build();
-            }
+        //player can't change her/his profile if is signed up for a match
+        if (playerProfileResult.isPresent() && isPlayerSignedUpForActiveEvent(playerProfileResult.get())) {
+            return PlayerProfileResponse.builder()
+                    .info(PlayerProfileInfo.YOU_ARE_SIGNED_UP_FOR_EVENT)
+                    .build();
+        }
 
-            //if benefit card is correct
-            if (!benefitService.isCorrect(request.getBenefitCardNumber())) {
-                return PlayerProfileResponse.builder()
-                        .info(PlayerProfileInfo.INCORRECT_BENEFIT_NUMBER)
-                        .build();
-
-            }
+        if (!benefitService.isCorrect(request.getBenefitCardNumber())) {
+            return PlayerProfileResponse.builder()
+                    .info(PlayerProfileInfo.INCORRECT_BENEFIT_NUMBER)
+                    .build();
         }
 
         PlayerProfile playerProfile = playerProfileResult.orElseGet(PlayerProfile::new);
