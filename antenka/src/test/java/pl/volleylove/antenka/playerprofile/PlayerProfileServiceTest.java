@@ -18,7 +18,6 @@ import pl.volleylove.antenka.enums.Position;
 import pl.volleylove.antenka.repository.PlayerProfileRepository;
 import pl.volleylove.antenka.security.NotAuthenticatedException;
 import pl.volleylove.antenka.user.UserService;
-import pl.volleylove.antenka.user.auth.AuthService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,8 +35,6 @@ class PlayerProfileServiceTest {
 
     @Mock
     private PlayerProfileRepository playerProfileRepository;
-    @Mock
-    private AuthService authService;
     @Mock
     private UserService userService;
     @Mock
