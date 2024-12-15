@@ -18,6 +18,7 @@ import pl.volleylove.antenka.enums.Position;
 import pl.volleylove.antenka.repository.PlayerProfileRepository;
 import pl.volleylove.antenka.security.NotAuthenticatedException;
 import pl.volleylove.antenka.user.UserService;
+import pl.volleylove.antenka.user.auth.AuthService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,17 +27,19 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static pl.volleylove.antenka.playerprofile.PlayerProfileService.calculateAge;
+import static pl.volleylove.antenka.playerprofile.PlayerProfileService.isPlayerSignedUpForActiveEvent;
 
 @ExtendWith(MockitoExtension.class)
 class PlayerProfileServiceTest {
 
     @Mock
-    private PlayerProfileRepository playerProfileRepository;
-    @Mock
     private UserService userService;
+    @Mock
+    private AuthService authService;
+    @Mock
+    private PlayerProfileRepository playerProfileRepository;
     @Mock
     private BenefitService benefitService;
 
@@ -48,6 +51,7 @@ class PlayerProfileServiceTest {
     private static final String BENEFIT_CARD_NUMBER = "1234567";
     private static final String NEW_BENEFIT_CARD_NUMBER = "7891011";
     private static final Level LEVEL = Level.BEGINNER;
+    private static final Long ID = 123456L;
 
     private User user;
 
@@ -60,11 +64,14 @@ class PlayerProfileServiceTest {
                 .benefitCardNumber(NEW_BENEFIT_CARD_NUMBER)
                 .positions(Set.of(Position.SETTER))
                 .level(LEVEL)
-                .gender(Gender.FEMALE).build();
+                .gender(Gender.FEMALE)
+                .build();
     }
 
     @Test
     void addOrUpdateProfileTestUpdateProfile() {
+
+        when(authService.getAuthenticatedUserID()).thenReturn(ID);
 
         user = User.builder().birthday(LocalDate.now().minusYears(ALLOWED_AGE_EXAMPLE)).build();
         when(userService.findByID(any(long.class))).thenReturn(Optional.of(user));
@@ -89,10 +96,18 @@ class PlayerProfileServiceTest {
         assertEquals(user.getBirthday(), response.getPlayerProfile().getUser().getBirthday());
         assertEquals(request.getLevel(), response.getPlayerProfile().getLevel());
 
+        verify(userService, times(1)).findByID(any(long.class));
+        verify(authService, times(1)).getAuthenticatedUserID();
+        verify(playerProfileRepository, times(1)).findByUser(any(User.class));
+        verify(playerProfileRepository, times(1)).save(any(PlayerProfile.class));
+        verify(benefitService, times(1)).isCorrect(any(String.class));
+        verify(benefitService, times(2)).isActive(any(String.class));
     }
 
     @Test
     void addOrUpdateProfileTestAddProfile() {
+
+        when(authService.getAuthenticatedUserID()).thenReturn(ID);
 
         user = User.builder().birthday(LocalDate.now().minusYears(ALLOWED_AGE_EXAMPLE)).build();
         when(userService.findByID(any(long.class))).thenReturn(Optional.of(user));
@@ -115,10 +130,18 @@ class PlayerProfileServiceTest {
         assertEquals(user.getBirthday(), response.getPlayerProfile().getUser().getBirthday());
         assertEquals(request.getLevel(), response.getPlayerProfile().getLevel());
 
+        verify(userService, times(1)).findByID(any(long.class));
+        verify(authService, times(1)).getAuthenticatedUserID();
+        verify(playerProfileRepository, times(1)).findByUser(any(User.class));
+        verify(playerProfileRepository, times(1)).save(any(PlayerProfile.class));
+        verify(benefitService, times(1)).isCorrect(any(String.class));
+        verify(benefitService, times(1)).isActive(any(String.class));
     }
 
     @Test
     void addOrUpdateProfileTestAddProfileWithoutBenefit() {
+
+        when(authService.getAuthenticatedUserID()).thenReturn(ID);
 
         user = User.builder().birthday(LocalDate.now().minusYears(ALLOWED_AGE_EXAMPLE)).build();
         when(userService.findByID(any(long.class))).thenReturn(Optional.of(user));
@@ -141,11 +164,19 @@ class PlayerProfileServiceTest {
         assertEquals(PlayerProfileInfo.OK, response.getInfo());
         assertEquals(user.getBirthday(), response.getPlayerProfile().getUser().getBirthday());
         assertEquals(request.getLevel(), response.getPlayerProfile().getLevel());
+
+        verify(userService, times(1)).findByID(any(long.class));
+        verify(authService, times(1)).getAuthenticatedUserID();
+        verify(playerProfileRepository, times(1)).findByUser(any(User.class));
+        verify(playerProfileRepository, times(1)).save(any(PlayerProfile.class));
+        verifyNoInteractions(benefitService);
     }
 
 
     @Test
     void addOrUpdateProfileTestUserNotFound() {
+
+        when(authService.getAuthenticatedUserID()).thenReturn(ID);
 
         when(userService.findByID(any(long.class))).thenReturn(Optional.empty());
 
@@ -154,10 +185,16 @@ class PlayerProfileServiceTest {
 
         assertEquals(PlayerProfileInfo.NOT_AUTHENTICATED, response.getInfo());
 
+        verify(userService, times(1)).findByID(any(long.class));
+        verify(authService, times(1)).getAuthenticatedUserID();
+        verifyNoInteractions(playerProfileRepository);
+        verifyNoInteractions(benefitService);
     }
 
     @Test
     void addOrUpdateProfileTestPlayerSignedUpForEvent() {
+
+        when(authService.getAuthenticatedUserID()).thenReturn(ID);
 
         user = User.builder().birthday(LocalDate.now().minusYears(ALLOWED_AGE_EXAMPLE)).build();
         when(userService.findByID(any(long.class))).thenReturn(Optional.of(user));
@@ -177,10 +214,16 @@ class PlayerProfileServiceTest {
 
         assertEquals(PlayerProfileInfo.YOU_ARE_SIGNED_UP_FOR_EVENT, response.getInfo());
 
+        verify(userService, times(1)).findByID(any(long.class));
+        verify(authService, times(1)).getAuthenticatedUserID();
+        verify(playerProfileRepository, times(1)).findByUser(any(User.class));
+        verify(benefitService, times(1)).isActive(any(String.class));
     }
 
     @Test
-    void addOrUpdateProfileTestIncorrectBenefitNumber() { //User has PlayerProfile and tries to update his/her Benefit Card number
+    void addOrUpdateProfileTestIncorrectBenefitNumberProfileUpdate() {
+
+        when(authService.getAuthenticatedUserID()).thenReturn(ID);
 
         user = User.builder().birthday(LocalDate.now().minusYears(ALLOWED_AGE_EXAMPLE)).build();
         when(userService.findByID(any(long.class))).thenReturn(Optional.of(user));
@@ -196,11 +239,19 @@ class PlayerProfileServiceTest {
         PlayerProfileResponse response = playerProfileService.addOrUpdateProfile(request);
 
         assertEquals(PlayerProfileInfo.INCORRECT_BENEFIT_NUMBER, response.getInfo());
-    }
 
+        verify(userService, times(1)).findByID(any(long.class));
+        verify(authService, times(1)).getAuthenticatedUserID();
+        verify(playerProfileRepository, times(1)).findByUser(any(User.class));
+        verify(playerProfileRepository, times(0)).save(any(PlayerProfile.class));
+        verify(benefitService, times(1)).isCorrect(any(String.class));
+        verify(benefitService, times(1)).isActive(any(String.class));
+    }
 
     @Test
     void getPlayerProfileOfAuthenticatedUserTestUserHasProfile() throws NotAuthenticatedException {
+
+        when(authService.getAuthenticatedUserID()).thenReturn(ID);
 
         user = User.builder().birthday(LocalDate.now().minusYears(ALLOWED_AGE_EXAMPLE)).build();
         when(userService.findByID(any(long.class))).thenReturn(Optional.of(user));
@@ -216,11 +267,15 @@ class PlayerProfileServiceTest {
 
         assertEquals(ALLOWED_AGE_EXAMPLE, playerProfile.getAge());
         assertFalse(playerProfile.isActiveBenefit());
+
+        verify(userService, times(1)).findByID(any(long.class));
+        verify(benefitService, times(1)).isActive(any(String.class));
     }
 
     @Test
     void getPlayerProfileOfAuthenticatedUserTestUserNotAuthenticated() {
 
+        when(authService.getAuthenticatedUserID()).thenReturn(0L);
         when(userService.findByID(any(long.class))).thenReturn(Optional.empty());
 
         try {
@@ -230,6 +285,9 @@ class PlayerProfileServiceTest {
             verifyNoInteractions(playerProfileRepository);
         }
 
+        verify(authService, times(1)).getAuthenticatedUserID();
+        verify(userService, times(1)).findByID(any(long.class));
+        verify(benefitService, times(0)).isActive(any(String.class));
     }
 
     @Test
@@ -243,8 +301,7 @@ class PlayerProfileServiceTest {
                                 .build())
                         .build())).build();
 
-        assertTrue(playerProfileService.isPlayerSignedUpForActiveEvent(playerProfile));
-
+        assertTrue(isPlayerSignedUpForActiveEvent(playerProfile));
     }
 
     @Test
@@ -252,8 +309,7 @@ class PlayerProfileServiceTest {
 
         PlayerProfile playerProfile = PlayerProfile.builder().apps(Set.of()).build();
 
-        assertFalse(playerProfileService.isPlayerSignedUpForActiveEvent(playerProfile));
-
+        assertFalse(isPlayerSignedUpForActiveEvent(playerProfile));
     }
 
     @Test
@@ -262,8 +318,6 @@ class PlayerProfileServiceTest {
         assertEquals(ALLOWED_AGE_EXAMPLE, calculateAge(LocalDate.now().minusYears(ALLOWED_AGE_EXAMPLE)));
         assertEquals(0, calculateAge(null));
         assertEquals(0, calculateAge(LocalDate.now().plusYears(ALLOWED_AGE_EXAMPLE)));
-
     }
-
 
 }
