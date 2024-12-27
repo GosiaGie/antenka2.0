@@ -214,7 +214,7 @@ Example of an unsuccessful adding `Match` with list of errors:
 {
     "addMatchInfo": [
         "Check your slots number",
-        "Date can't be past date or date after 6 months from now",
+        "Date can't be: past date, date under 3 h from now or date after 6 months from now",
         "Incorrect address",
         "Incorrect price. Price can't be under 0.0 and regular price can't be higher than benefit price",
         "Incorrect age: under 16, over 150 or min>max"
