@@ -126,7 +126,7 @@ POST /addMatch
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
 | `name` | `string` | **Required**. Match name.|
-| `dateTime` | `dateTime` | **Required**. Not in the past or more than 6 months from now. **WARNING** Your match will be auto-closed after it's date and time.|
+| `dateTime` | `dateTime` | **Required**. Not in the past, below 3 hours from current time or more than 6 months from now. **WARNING** Your match will be auto-closed after it's date and time.|
 | `price` | `number` | **Required**. Price per 1 player. If Benefit system is unavailable, then `regularPrice` argument should be equal `benefitPrice` argument.|
 | `address` | all `string` | **Every field required except `flatNumber`** . Every parameter of an address is `string. 'street' without white spaces. `zipcode` can be only digits. `Locality` can be only letters.|
 | `playersNum` | `integer` | **Required**. Number of players to find. Must be equal `playersWanted` size and max 24.|
