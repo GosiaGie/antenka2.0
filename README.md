@@ -274,20 +274,7 @@ Example of a successful adding player's profile:
 
 
 ## Finding a match
-Results are based on a user's player profile. This API has two endpoints, which enables to find matches. Because of bidirectional relationalship between `Match` and `Slot`, results can be in structure:
-
-**1) matches with slots where a user meets requirements (and other these matches' slots)**
-
-   or
-   
-**2) only slots where a user meets the requirements.**
-
-Every 'Slot' has also basic informations about a 'Match': 'eventID, name, dateTime, price, address'.
-User without a player's profile can't find and sign up for a match.
-Client sends only a maximal user's price for a `Match`. If a user has an active Benefit card, then Benefit prices are checked. If player doesn't have active benefit card, then only regular price are checked.
-
-
-### 1) matches with slots where a user meets requirements (and other these matches' slots too)
+Results are based on a user's player profile. Results are Matches, where user meets requirements (and all these matches' slots - needs to think it out). At this moment, client sends only a maximal user's price for a `Match`. If a user has an active Benefit card, then Benefit prices are checked. If player doesn't have active benefit card, then only regular price are checked.
 
 ```http
 POST /findMatch
@@ -296,6 +283,11 @@ POST /findMatch
 ```json
 "40"
 ```
+
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| `maxPrice` | `string` | **Required**. Maximal price for Match. Format with '.'- example: "10.10"
+
 ### Response
 
 ```json
@@ -404,63 +396,6 @@ POST /findMatch
                     "playerApplied": null
                 }
             ]
-        }
-    ]
-}
-```
-
-### 2) only slots where a user meets the requirements
-
-```http
-POST /findSlots
-```
-
-```json
-"40"
-```
-
-### Response
-
-```json
-{
-    "info": "OK",
-    "slots": [
-        {
-            "id": 113,
-            "match": {
-                "eventID": 186,
-                "name": "Warszawski Mecz Charytatywny",
-                "dateTime": "2024-04-23T18:00:00",
-                "price": {
-                    "regularPrice": 20,
-                    "benefitPrice": 10
-                },
-                "address": {
-                    "addressID": 188,
-                    "addressType": "EVENT",
-                    "street": "AdolfaPawińskiego",
-                    "number": "2",
-                    "flatNumber": null,
-                    "zipCode": "02106",
-                    "locality": "Warsaw",
-                    "location": {
-                        "lat": 52.2097818,
-                        "lng": 20.9800504
-                    },
-                    "description": "Hala"
-                }
-            },
-            "orderNum": 1,
-            "playerWanted": {
-                "gender": "FEMALE",
-                "ageRange": {
-                    "ageMin": 20,
-                    "ageMax": 35
-                },
-                "level": "BEGINNER",
-                "position": "SETTER"
-            },
-            "playerApplied": null
         }
     ]
 }
