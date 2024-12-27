@@ -11,7 +11,7 @@ Antenka is a project where users can:
 1) add a volleyball match and find its players,
 2) find a voleyball match to play.
 
-Basic concept is an event (abstract `Event`) - at this moment only voleyball `Match` and its placeholders for players `Slots`s. Every `Slot` has requirements about a wanted player and a player, who applied on this.
+Basic concept is an event (abstract `Event`) - at this moment only `Match` and its placeholders for players `Slots`s. Every `Slot` has requirements about a wanted player and a player, who applied on this.
 Because of a biderectional relationship between `Match`and `Slot`, it is easy to use `Slot` 's reference to `Match` and get informations about a match.
 
 ![obraz](https://github.com/GosiaGie/antenka/assets/52133577/5646416b-66e4-481d-999e-4ebcaf4d963b)
