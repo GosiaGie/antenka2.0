@@ -31,18 +31,12 @@ import java.util.Set;
 //main service class for Match
 public class MatchService {
 
-    private MatchRepository matchRepository;
-
-    private AuthService authService;
-
-    private UserService userService;
-
-    private PlayerProfileService playerProfileService;
-
-
-    private LocationService locationService;
-
-    private SlotService slotService;
+    private final MatchRepository matchRepository;
+    private final AuthService authService;
+    private final UserService userService;
+    private final PlayerProfileService playerProfileService;
+    private final LocationService locationService;
+    private final SlotService slotService;
 
     @Autowired
     public MatchService(MatchRepository matchRepository, AuthService authService, UserService userService, PlayerProfileService playerProfileService, LocationService locationService, SlotService slotService) {
