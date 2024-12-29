@@ -75,7 +75,7 @@ public class MatchService {
             userOrganizer = userService.findByID(authenticatedUserID).orElseThrow();
         } catch (NoSuchElementException e) {
             return AddMatchResponse.builder()
-                    .addMatchInfo(List.of("USER_NOT_FOUND"))
+                    .addMatchInfo(List.of("User not found"))
                     .build();
         }
 
@@ -106,7 +106,6 @@ public class MatchService {
                 .build();
 
     }
-
 
     public FindMatchResponse findMatch(FindMatchRequest request) throws NotAuthenticatedException {
 
@@ -145,10 +144,6 @@ public class MatchService {
                 .build();
     }
 
-    //returning SLOTS and match info
-
-
-
     @Transactional
     public SignUpForMatchResponse signUpForMatch(SignUpForMatchRequest request) {
 
@@ -174,7 +169,6 @@ public class MatchService {
                     .build();
         }
 
-
         //2. checking if this Match exists
         try {
             match = matchRepository.findById(request.getEventID()).orElseThrow();
@@ -193,18 +187,17 @@ public class MatchService {
                     .build();
         }
 
-
-        //4. checking if the match is open - organizer:
-        // I) didn't close it
+        //4. checking if the match is active
+        // I) organizer didn't close it
         // II) match is not in the past
-        if (!slotToSignUp.getEvent().isActive()) {
+        if (!match.isActive()) {
             return SignUpForMatchResponse.builder()
                     .info(SignUpInfo.EVENT_IS_CLOSED)
                     .build();
         }
 
         //5.checking if match has any free slot left
-        if (!slotToSignUp.getEvent().isSigningUp()) {
+        if (!match.isSigningUp()) {
             return SignUpForMatchResponse.builder()
                     .info(SignUpInfo.EVENT_HAS_NO_FREE_SLOTS_LEFT)
                     .build();
@@ -249,20 +242,16 @@ public class MatchService {
             match.setSigningUp(false);
         }
 
-
         return SignUpForMatchResponse.builder()
                 .info(SignUpInfo.OK)
                 .match(matchRepository.save(match))
                 .slot(slotToSignUp)
                 .build();
-
-
     }
 
     public boolean isPlayerSignUpForThisMatch(Match match, PlayerProfile playerProfile) {
         return match.getSlots().stream().anyMatch(slot -> playerProfile.equals(slot.getPlayerApplied()));
     }
-
 
     public boolean isPlayerMeetReq(PlayerProfile playerProfile, PlayerWanted playerWanted) {
 
