@@ -1,10 +1,7 @@
 package pl.volleylove.antenka.event;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import pl.volleylove.antenka.enums.Gender;
 import pl.volleylove.antenka.enums.Level;
 import pl.volleylove.antenka.enums.Position;
@@ -16,6 +13,7 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class PlayerWanted {
 
     @Column(name = "gender")
