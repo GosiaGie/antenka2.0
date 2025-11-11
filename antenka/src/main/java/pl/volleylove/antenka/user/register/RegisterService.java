@@ -7,40 +7,30 @@ import pl.volleylove.antenka.entity.User;
 import pl.volleylove.antenka.enums.RegisterInfo;
 import pl.volleylove.antenka.enums.Role;
 import pl.volleylove.antenka.user.UserService;
+import pl.volleylove.antenka.user.register.validators.interfaces.RegisterRequestValidator;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 @Service
 public class RegisterService {
 
     private final UserService userService;
-
     private final PasswordEncoder passwordEncoder;
-
+    private final RegisterRequestValidator validator;
 
     @Autowired
-    public RegisterService(UserService userService, PasswordEncoder passwordEncoder) {
+    public RegisterService(UserService userService, PasswordEncoder passwordEncoder, RegisterRequestValidator validator) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.validator = validator;
     }
 
     public RegisterResponse register(RegisterRequest registerRequest) {
 
-        //checking if request or any field of it is null
-        if (isNullOrHasNull(registerRequest)) {
-            return RegisterResponse.builder()
-                    .registerInfo(List.of(RegisterInfo.MISSING_INFO))
-                    .build();
-        }
-
-        //validation data - if any data doesn't meet requirements, then return response
-        List<RegisterInfo> validateInfo = validateData(registerRequest);
+        List<RegisterInfo> validateInfo = validator.validateRequest(registerRequest);
         if (!validateInfo.isEmpty()) {
             return RegisterResponse.builder()
-                    .email(registerRequest.getEmail())
+                    .email(registerRequest == null || registerRequest.getEmail() == null ? "" : registerRequest.getEmail())
                     .registerInfo(validateInfo).build();
         }
 
@@ -71,39 +61,4 @@ public class RegisterService {
                 .build();
 
     }
-
-
-    private List<RegisterInfo> validateData(RegisterRequest request) {
-
-        List<RegisterInfo> validateInfo = new ArrayList<>();
-
-        if (!RegisterValidator.isNameFormatCorrect(request.getFirstName())) {
-            validateInfo.add(RegisterInfo.INCORRECT_FIRST_NAME);
-        }
-        if (!RegisterValidator.isNameFormatCorrect(request.getLastName())) {
-            validateInfo.add(RegisterInfo.INCORRECT_LAST_NAME);
-        }
-        if (!RegisterValidator.isEmailFormatCorrect(request.getEmail())) {
-            validateInfo.add(RegisterInfo.INCORRECT_EMAIL);
-        }
-        if (!RegisterValidator.isPasswordFormatCorrect(request.getPassword())) {
-            validateInfo.add(RegisterInfo.PASSWORD_DOES_NOT_MEET_REQ);
-        }
-        if (!RegisterValidator.isAgeCorrect(request.getBirthday())) {
-            validateInfo.add(RegisterInfo.NOT_ALLOWED_AGE);
-        }
-
-        return validateInfo;
-    }
-
-    private boolean isNullOrHasNull(RegisterRequest request) {
-
-        if (request == null) {
-            return true;
-        }
-
-        return Stream.of(request.getFirstName(), request.getLastName(), request.getEmail(), request.getPassword(), request.getBirthday())
-                    .anyMatch(Objects::isNull);
-    }
-
 }
