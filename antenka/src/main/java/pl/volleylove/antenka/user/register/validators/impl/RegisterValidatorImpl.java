@@ -1,13 +1,19 @@
-package pl.volleylove.antenka.user.register;
+package pl.volleylove.antenka.user.register.validators.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.volleylove.antenka.user.register.RegisterRequest;
+import pl.volleylove.antenka.user.register.validators.interfaces.DateTime;
+import pl.volleylove.antenka.user.register.validators.interfaces.RegisterValidator;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 @Service
-public class RegisterValidator {
+public class RegisterValidatorImpl implements RegisterValidator {
 
     private static final int MIN_AGE = 16;
     private static final int MAX_AGE = 150;
@@ -16,24 +22,27 @@ public class RegisterValidator {
     private static final int MIN_PASS_LENGTH = 8;
     private static final int MAX_PASS_LENGTH = 30;
 
-    private RegisterValidator() {
+    private DateTime dateTime;
 
+    @Autowired
+    public RegisterValidatorImpl(DateTime dateTime) {
+        this.dateTime = dateTime;
     }
 
-    public static boolean isAgeCorrect(LocalDate birthday) {
+    public boolean isAgeCorrect(LocalDate birthday) {
 
         if (birthday == null) {
             return false;
         }
 
-        LocalDate lastDateAllowed = LocalDate.now().minusYears(MIN_AGE);
-        LocalDate firstDateAllowed = LocalDate.now().minusYears(MAX_AGE);
+        LocalDate lastDateAllowed = dateTime.getDate().minusYears(MIN_AGE);
+        LocalDate firstDateAllowed = dateTime.getDate().minusYears(MAX_AGE);
 
         return birthday.isEqual(firstDateAllowed) || birthday.isEqual(lastDateAllowed) || (birthday.isBefore(lastDateAllowed) && birthday.isAfter(firstDateAllowed));
     }
 
     //method for first name and last name
-    public static boolean isNameFormatCorrect(String name) {
+    public boolean isNameFormatCorrect(String name) {
 
         if (name == null) {
             return false;
@@ -45,7 +54,7 @@ public class RegisterValidator {
     }
 
 
-    public static boolean isEmailFormatCorrect(String email) {
+    public boolean isEmailFormatCorrect(String email) {
 
         if (email == null) {
             return false;
@@ -59,7 +68,7 @@ public class RegisterValidator {
     }
 
 
-    public static boolean isPasswordFormatCorrect(String password) {
+    public boolean isPasswordFormatCorrect(String password) {
 
         if (password == null) {
             return false;

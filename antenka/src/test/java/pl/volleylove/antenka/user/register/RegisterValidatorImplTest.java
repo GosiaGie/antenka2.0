@@ -6,16 +6,29 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.volleylove.antenka.user.register.validators.impl.RegisterValidatorImpl;
+import pl.volleylove.antenka.user.register.validators.interfaces.DateTime;
 
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class RegisterValidatorTest {
+class RegisterValidatorImplTest {
+
+    @Mock
+    private DateTime dateTime;
+
+    @InjectMocks
+    private RegisterValidatorImpl registerValidator;
+
+    private static final LocalDate FIXED_DATE = LocalDate.of(2025,11,11);
 
     //isAgeCorrect() tests
     //current requirements - min: 16, max: 150
@@ -35,10 +48,12 @@ class RegisterValidatorTest {
     @ParameterizedTest
     @MethodSource("provideAge")
     void isAgeCorrectTest(int age, boolean expected) {
+        when(dateTime.getDate()).thenReturn(FIXED_DATE);
 
-        //passing negative values results future data
-        assertEquals(expected, RegisterValidator.isAgeCorrect(LocalDate.now().minusYears(age)));
+        //passing negative values result in future data
+        assertEquals(expected, registerValidator.isAgeCorrect(LocalDate.now().minusYears(age)));
 
+        verify(dateTime, times(2)).getDate();
     }
 
     //isNameFormatCorrect() tests
@@ -55,9 +70,7 @@ class RegisterValidatorTest {
     @ParameterizedTest
     @MethodSource("provideNames")
     void isNameFormatCorrectTest(String name, boolean expected) {
-
-        assertEquals(expected, RegisterValidator.isNameFormatCorrect(name));
-
+        assertEquals(expected, registerValidator.isNameFormatCorrect(name));
     }
 
     //isNameFormatCorrect() tests
@@ -80,9 +93,7 @@ class RegisterValidatorTest {
     @ParameterizedTest
     @MethodSource("provideEmails")
     void isEmailFormatCorrectTest(String email, boolean expected) {
-
-        assertEquals(expected, RegisterValidator.isEmailFormatCorrect(email));
-
+        assertEquals(expected, registerValidator.isEmailFormatCorrect(email));
     }
 
 
@@ -102,21 +113,15 @@ class RegisterValidatorTest {
     @ParameterizedTest
     @MethodSource("providePasswords")
     void isPasswordFormatCorrectTest(String password, boolean expected) {
-
-        assertEquals(expected, RegisterValidator.isPasswordFormatCorrect(password));
-
+        assertEquals(expected, registerValidator.isPasswordFormatCorrect(password));
     }
 
     @Test
     void registerValidatorMethodsGetNull() {
-        assertFalse(RegisterValidator.isAgeCorrect(null));
-
-        assertFalse(RegisterValidator.isNameFormatCorrect(null));
-
-        assertFalse(RegisterValidator.isEmailFormatCorrect(null));
-
-        assertFalse(RegisterValidator.isPasswordFormatCorrect(null));
-
+        assertFalse(registerValidator.isAgeCorrect(null));
+        assertFalse(registerValidator.isNameFormatCorrect(null));
+        assertFalse(registerValidator.isEmailFormatCorrect(null));
+        assertFalse(registerValidator.isPasswordFormatCorrect(null));
     }
 
 }
