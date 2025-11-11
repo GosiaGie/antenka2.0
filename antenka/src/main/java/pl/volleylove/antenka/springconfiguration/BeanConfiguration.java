@@ -7,6 +7,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import pl.volleylove.antenka.map.GoogleMapsApiHelper;
 import pl.volleylove.antenka.map.GoogleMapsApiProperties;
 import pl.volleylove.antenka.security.*;
+import pl.volleylove.antenka.user.register.validators.impl.DateTimeImpl;
+
+import java.time.Clock;
 
 @Configuration
 public class BeanConfiguration {
@@ -46,5 +49,11 @@ public class BeanConfiguration {
 
     @Bean
     public GoogleMapsApiProperties googleMapsApiProperties() { return new GoogleMapsApiProperties();}
+
+    @Bean
+    public Clock clock() {return Clock.systemDefaultZone();}
+
+    @Bean
+    public DateTimeImpl dateTime() {return new DateTimeImpl(clock());};
 
 }
