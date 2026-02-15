@@ -11,6 +11,8 @@ import pl.volleylove.antenka.event.match.add.AddMatchRequest;
 import pl.volleylove.antenka.event.match.add.AddMatchResponse;
 import pl.volleylove.antenka.event.match.find.FindMatchRequest;
 import pl.volleylove.antenka.event.match.find.FindMatchResponse;
+import pl.volleylove.antenka.event.match.optout.OptOutRequest;
+import pl.volleylove.antenka.event.match.optout.OptOutResponse;
 import pl.volleylove.antenka.event.match.signup.SignUpForMatchRequest;
 import pl.volleylove.antenka.event.match.signup.SignUpForMatchResponse;
 import pl.volleylove.antenka.security.NotAuthenticatedException;
@@ -44,12 +46,18 @@ public class MatchController {
     }
 
     @PostMapping("/signUp")
-    public SignUpForMatchResponse signUp(@RequestBody SignUpForMatchRequest request) throws NotAuthenticatedException {
+    public SignUpForMatchResponse signUp(@RequestBody SignUpForMatchRequest request) {
 
         return matchService.signUpForMatch(request);
 
     }
 
+    @PostMapping("optOut")
+    public OptOutResponse optOut(@RequestBody OptOutRequest request) throws NotAuthenticatedException {
+
+        return matchService.optOut(request);
+
+    }
 
 }
 
