@@ -475,3 +475,39 @@ Example of an unsuccessful signing up for a match
 }
 ```
 
+
+## Opting out 
+
+```http
+POST /optOut
+```
+
+```json
+{
+    "eventID": "186",
+    "optOutReason":"OTHER"
+
+}
+```
+
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| `eventID` | `string` | **Required**|
+| `optOutReason` | `String` | **Required**. One of 'HEALTH_ISSUE, WANT_ANOTHER_EVENT, OTHER'|`.|
+
+### Response
+```json
+{
+    "info": "OK"
+}
+```
+
+Example of an unsuccessful signing up for a match
+
+```json
+{
+    "info": "INACTIVE_EVENT"
+}
+```
+You can't opt out of an inactive Match.
+
