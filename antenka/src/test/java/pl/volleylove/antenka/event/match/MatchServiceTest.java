@@ -8,16 +8,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import pl.volleylove.antenka.entity.*;
-import pl.volleylove.antenka.enums.FindMatchInfo;
-import pl.volleylove.antenka.enums.Gender;
-import pl.volleylove.antenka.enums.Level;
-import pl.volleylove.antenka.enums.Position;
+import pl.volleylove.antenka.enums.*;
 import pl.volleylove.antenka.event.AgeRange;
 import pl.volleylove.antenka.event.PlayerWanted;
 import pl.volleylove.antenka.event.match.add.AddMatchRequest;
 import pl.volleylove.antenka.event.match.add.AddMatchResponse;
 import pl.volleylove.antenka.event.match.find.FindMatchRequest;
 import pl.volleylove.antenka.event.match.find.FindMatchResponse;
+import pl.volleylove.antenka.event.match.optout.OptOutRequest;
+import pl.volleylove.antenka.event.match.optout.OptOutResponse;
 import pl.volleylove.antenka.event.match.signup.SignUpForMatchRequest;
 import pl.volleylove.antenka.event.match.signup.SignUpForMatchResponse;
 import pl.volleylove.antenka.map.LocationService;
@@ -581,6 +580,16 @@ class MatchServiceTest {
         verify(matchRepository, times(1)).save(any(Match.class));
     }
 
+    @Test
+    void optOutTestIncorrectEventID() throws NotAuthenticatedException {
+
+        when(matchRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        OptOutRequest optOutRequest = new OptOutRequest(EVENT_ID, SLOT_ORDER_NUM_1, OptOutReason.OTHER);
+        OptOutResponse expectedResponse = OptOutResponse.builder().info(OptOutInfo.INCORRECT_EVENT_ID).build();
+
+        assertEquals(expectedResponse, matchService.optOut(optOutRequest));
+    }
 
 
 }
