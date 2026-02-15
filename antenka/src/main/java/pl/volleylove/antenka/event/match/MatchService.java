@@ -11,6 +11,8 @@ import pl.volleylove.antenka.event.match.add.AddMatchRequest;
 import pl.volleylove.antenka.event.match.add.AddMatchResponse;
 import pl.volleylove.antenka.event.match.find.FindMatchRequest;
 import pl.volleylove.antenka.event.match.find.FindMatchResponse;
+import pl.volleylove.antenka.event.match.optout.OptOutRequest;
+import pl.volleylove.antenka.event.match.optout.OptOutResponse;
 import pl.volleylove.antenka.event.match.signup.SignUpForMatchRequest;
 import pl.volleylove.antenka.event.match.signup.SignUpForMatchResponse;
 import pl.volleylove.antenka.map.LocationService;
@@ -21,10 +23,7 @@ import pl.volleylove.antenka.user.UserService;
 import pl.volleylove.antenka.user.auth.AuthService;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 //class for business logic
 @Service
@@ -255,6 +254,63 @@ public class MatchService {
                 && playerWanted.getAgeRange().getAgeMin() <= playerProfile.getAge()  //age
                 && playerWanted.getAgeRange().getAgeMax() >= playerProfile.getAge();
 
+    }
+
+    @Transactional
+    public OptOutResponse optOut(OptOutRequest request) throws NotAuthenticatedException {
+
+        Match match;
+
+        //checking if eventID is correct
+        try {
+            match = matchRepository.findById(request.getEventID()).orElseThrow();
+        } catch (NoSuchElementException e) {
+            return OptOutResponse.builder()
+                    .info(OptOutInfo.INCORRECT_ID)
+                    .build();
+        }
+
+        //checking if slot number is correct
+        Slot slot;
+        try {
+            slot = match.getSlots().stream().filter(s -> s.getOrderNum() == request.getOrderNum()).findAny().orElseThrow();
+        } catch (NoSuchElementException e) {
+            return OptOutResponse.builder()
+                    .info(OptOutInfo.INCORRECT_SLOT_NUM)
+                    .build();
+        }
+
+        //checking if this Player is signed up
+        PlayerProfile playerProfile;
+
+            //1.fetching Player's Profile
+        try {
+            playerProfile = playerProfileService.getPlayerProfileOfAuthenticatedUser().orElseThrow();
+        } catch (NoSuchElementException e) {
+            //Player's Profile can't be found - something is wrong
+            return OptOutResponse.builder()
+                    .info(OptOutInfo.COMPLETE_PLAYER_OR_TEAM_PROFILE)
+                    .build();
+        }
+            //2. comparing slot's PlayerProfile and PlayerProfile from the request
+        if (!slot.getPlayerApplied().equals(playerProfile)) {
+            return OptOutResponse.builder()
+                    .info(OptOutInfo.NOT_SIGNED_UP)
+                    .build();
+        }
+
+        //checking if event is active
+        if (!match.isActive()) {
+            return OptOutResponse.builder()
+                    .info(OptOutInfo.INACTIVE_EVENT)
+                    .build();
+        }
+
+        //final step - removing Player from the slot
+        slot.setPlayerApplied(null);
+        return OptOutResponse.builder()
+                .info(OptOutInfo.OK)
+                .build();
     }
 
 }
