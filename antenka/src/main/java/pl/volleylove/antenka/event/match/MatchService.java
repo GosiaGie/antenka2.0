@@ -266,7 +266,7 @@ public class MatchService {
             match = matchRepository.findById(request.getEventID()).orElseThrow();
         } catch (NoSuchElementException e) {
             return OptOutResponse.builder()
-                    .info(OptOutInfo.INCORRECT_ID)
+                    .info(OptOutInfo.INCORRECT_EVENT_ID)
                     .build();
         }
 
