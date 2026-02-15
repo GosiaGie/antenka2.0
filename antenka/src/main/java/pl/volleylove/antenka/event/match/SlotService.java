@@ -24,7 +24,7 @@ public class SlotService {
 
     public Set<Slot> saveSlotsInMatch(Long randomMatchID, List<PlayerWanted> players) {
 
-        //1. Every PlayerWanted will get be in slot, with infos about match and orderNum
+        //1. Every PlayerWanted will get be in slot, with info about match and orderNum
         //2. changing type from List to Set, for preventing duplicates
         //3. setting every slot its order number for this match - to better order
         //and to prevent replacing slots with the same requirements (Set can't have duplicates)
