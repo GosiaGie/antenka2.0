@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import pl.volleylove.antenka.entity.*;
@@ -30,6 +32,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -590,6 +594,18 @@ class MatchServiceTest {
 
         assertEquals(expectedResponse, matchService.optOut(optOutRequest));
     }
+    @Test
+    void optOutTestIncorrectSlotNumber() throws NotAuthenticatedException {
 
+        when(matchRepository.findById(any(long.class))).thenAnswer(answer -> Optional.of(Match.builder()
+                .slots(Set.of(Slot.builder().orderNum(SLOT_ORDER_NUM_1).build()))
+                .eventID(EVENT_ID)
+                .build()));
+
+        OptOutRequest optOutRequest = new OptOutRequest(EVENT_ID, SLOT_ORDER_NUM_2, OptOutReason.OTHER);
+        OptOutResponse expectedResponse = OptOutResponse.builder().info(OptOutInfo.INCORRECT_SLOT_NUM).build();
+
+        assertEquals(expectedResponse, matchService.optOut(optOutRequest));
+    }
 
 }
