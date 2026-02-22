@@ -653,5 +653,34 @@ class MatchServiceTest {
         verify(playerProfileService, times(1)).getPlayerProfileOfAuthenticatedUser();
     }
 
+    @Test
+    void optOutTestSignedUpForMatchButInDifferentSlot() throws NotAuthenticatedException {
+        //Player from request is signed up for this Match, but not in this 1. Slot
+        when(matchRepository.findById(any(long.class))).thenAnswer(answer -> Optional.of(Match.builder()
+                .slots(Set.of(
+                        Slot.builder() //Slot nr 1 - this is where player from request is NOT signed up
+                                .orderNum(SLOT_ORDER_NUM_1)
+                                .playerApplied(PlayerProfile.builder().playerProfileID(PLAYER_PROFILE_ID_1).build())
+                                .build(),
+                        Slot.builder() //Slot nr 2 - this is where player from request is signed up
+                                .orderNum(SLOT_ORDER_NUM_2)
+                                .playerApplied(PlayerProfile.builder().playerProfileID(PLAYER_PROFILE_ID_2).build())
+                                .build()))
+                .eventID(EVENT_ID)
+                .build()));
+
+        when(playerProfileService.getPlayerProfileOfAuthenticatedUser())
+                .thenReturn(Optional.of(PlayerProfile.builder().playerProfileID(PLAYER_PROFILE_ID_2).build()));
+
+        OptOutRequest optOutRequest = new OptOutRequest(EVENT_ID,
+                SLOT_ORDER_NUM_1, //request with Slot nr 1, where Player is not signed up
+                OptOutReason.OTHER);
+
+        OptOutResponse expectedResponse = OptOutResponse.builder().info(OptOutInfo.NOT_SIGNED_UP).build();
+        assertEquals(expectedResponse, matchService.optOut(optOutRequest));
+
+        verify(matchRepository, times(1)).findById(any(long.class));
+        verify(playerProfileService, times(1)).getPlayerProfileOfAuthenticatedUser();
+    }
 
 }
