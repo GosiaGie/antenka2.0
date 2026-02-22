@@ -476,7 +476,7 @@ Example of an unsuccessful signing up for a match
 ```
 
 
-## Opting out - TEST IN PROGRESS, PLANNED FINISH: 22.02
+## Opting out - NEW, FINISHED: 22.02
 
 ```http
 POST /optOut
