@@ -699,4 +699,34 @@ class MatchServiceTest {
         verify(playerProfileService, times(0)).getPlayerProfileOfAuthenticatedUser();
     }
 
+    @Test
+    void optOutTestSuccess() throws NotAuthenticatedException {
+
+        when(matchRepository.findById(any(long.class))).thenAnswer(answer -> Optional.of(Match.builder()
+                .dateTime(LocalDateTime.now().plusDays(7))
+                .slots(Set.of(Slot.builder()
+                                .orderNum(SLOT_ORDER_NUM_1)
+                                .playerApplied(PlayerProfile.builder()
+                                        .playerProfileID(PLAYER_PROFILE_ID_1)
+                                        .user(User.builder().userID(1L).build())
+                                        .build())
+                                .build()))
+                .isActive(true)
+                .build()));
+
+        when(playerProfileService.getPlayerProfileOfAuthenticatedUser())
+                .thenReturn(Optional.of(PlayerProfile.builder()
+                        .playerProfileID(PLAYER_PROFILE_ID_1)
+                        .user(User.builder().userID(1L).build())
+                        .build()));
+
+        OptOutRequest optOutRequest = new OptOutRequest(EVENT_ID, SLOT_ORDER_NUM_1, OptOutReason.OTHER);
+
+        OptOutResponse expectedResponse = OptOutResponse.builder().info(OptOutInfo.OK).build();
+        assertEquals(expectedResponse, matchService.optOut(optOutRequest));
+
+        verify(matchRepository, times(1)).findById(any(long.class));
+        verify(playerProfileService, times(1)).getPlayerProfileOfAuthenticatedUser();
+    }
+
 }
