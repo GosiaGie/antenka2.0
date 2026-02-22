@@ -75,7 +75,11 @@ public class PlayerProfile {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PlayerProfile that = (PlayerProfile) o;
-        return isSignedUpForActiveEvent == that.isSignedUpForActiveEvent && age == that.age && activeBenefit == that.activeBenefit && Objects.equals(playerProfileID, that.playerProfileID) && Objects.equals(user.getUserID(), that.user.getUserID()) && Objects.equals(positions, that.positions) && level == that.level && gender == that.gender && Objects.equals(benefitCardNumber, that.benefitCardNumber) && Objects.equals(apps, that.apps);
+        return isSignedUpForActiveEvent == that.isSignedUpForActiveEvent && age == that.age
+                && activeBenefit == that.activeBenefit && Objects.equals(playerProfileID, that.playerProfileID)
+                && Objects.equals(user.getUserID(), that.user.getUserID()) && Objects.equals(positions, that.positions)
+                && level == that.level && gender == that.gender && Objects.equals(benefitCardNumber, that.benefitCardNumber)
+                && Objects.equals(apps, that.apps);
     }
 
     @Override
