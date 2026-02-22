@@ -270,6 +270,13 @@ public class MatchService {
                     .build();
         }
 
+        //checking if event is active
+        if (!match.isActive()) {
+            return OptOutResponse.builder()
+                    .info(OptOutInfo.INACTIVE_EVENT)
+                    .build();
+        }
+
         //checking if slot number is correct
         Slot slot;
         try {
@@ -299,12 +306,7 @@ public class MatchService {
                     .build();
         }
 
-        //checking if event is active
-        if (!match.isActive()) {
-            return OptOutResponse.builder()
-                    .info(OptOutInfo.INACTIVE_EVENT)
-                    .build();
-        }
+
 
         //final step - removing Player from the slot
         //because of @Transactional no need of save() method
