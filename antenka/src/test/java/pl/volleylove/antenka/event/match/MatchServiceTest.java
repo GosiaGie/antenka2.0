@@ -66,6 +66,9 @@ class MatchServiceTest {
     private static final String MATCH_NAME = "Super match";
     private static final String OK_MSG = "OK";
     private static final Long EVENT_ID = 1L;
+    private static final Long PLAYER_PROFILE_ID_1 = 1L;
+    private static final Long PLAYER_PROFILE_ID_2 = 2L;
+
     private static final int SLOT_ORDER_NUM_1 = 1;
     private static final int SLOT_ORDER_NUM_2 = 2;
     private static final int INCORRECT_SLOT_ORDER_NUM = 123456789;
@@ -625,7 +628,30 @@ class MatchServiceTest {
 
         verify(matchRepository, times(1)).findById(any(long.class));
         verify(playerProfileService, times(1)).getPlayerProfileOfAuthenticatedUser();
-
     }
+
+    @Test
+    void optOutTestNotSignedUp() throws NotAuthenticatedException {
+
+        when(matchRepository.findById(any(long.class))).thenAnswer(answer -> Optional.of(Match.builder()
+                .slots(Set.of(Slot.builder()
+                        .orderNum(SLOT_ORDER_NUM_1)
+                        .playerApplied(PlayerProfile.builder().playerProfileID(PLAYER_PROFILE_ID_1).build())
+                        .build()))
+                .eventID(EVENT_ID)
+                .build()));
+
+        when(playerProfileService.getPlayerProfileOfAuthenticatedUser())
+                .thenReturn(Optional.of(PlayerProfile.builder().playerProfileID(PLAYER_PROFILE_ID_2).build()));
+
+        OptOutRequest optOutRequest = new OptOutRequest(EVENT_ID, SLOT_ORDER_NUM_1, OptOutReason.OTHER);
+        OptOutResponse expectedResponse = OptOutResponse.builder().info(OptOutInfo.NOT_SIGNED_UP).build();
+
+        assertEquals(expectedResponse, matchService.optOut(optOutRequest));
+
+        verify(matchRepository, times(1)).findById(any(long.class));
+        verify(playerProfileService, times(1)).getPlayerProfileOfAuthenticatedUser();
+    }
+
 
 }
