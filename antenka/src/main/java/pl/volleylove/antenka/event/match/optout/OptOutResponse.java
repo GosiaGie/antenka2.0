@@ -9,6 +9,7 @@ import pl.volleylove.antenka.enums.OptOutInfo;
 @NoArgsConstructor
 @Builder
 @EqualsAndHashCode
+@ToString
 public class OptOutResponse {
 
     private OptOutInfo info;
