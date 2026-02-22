@@ -307,6 +307,7 @@ public class MatchService {
         }
 
         //final step - removing Player from the slot
+        //because of @Transactional no need of save() method
         slot.setPlayerApplied(null);
         return OptOutResponse.builder()
                 .info(OptOutInfo.OK)
