@@ -1,6 +1,7 @@
 package pl.volleylove.antenka.event.match;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
@@ -15,6 +16,7 @@ import pl.volleylove.antenka.event.match.optout.OptOutRequest;
 import pl.volleylove.antenka.event.match.optout.OptOutResponse;
 import pl.volleylove.antenka.event.match.signup.SignUpForMatchRequest;
 import pl.volleylove.antenka.event.match.signup.SignUpForMatchResponse;
+import pl.volleylove.antenka.mail.EmailService;
 import pl.volleylove.antenka.map.LocationService;
 import pl.volleylove.antenka.playerprofile.PlayerProfileService;
 import pl.volleylove.antenka.repository.MatchRepository;
@@ -28,6 +30,7 @@ import java.util.*;
 //class for business logic
 @Service
 //main service class for Match
+@Slf4j
 public class MatchService {
 
     private final MatchRepository matchRepository;
@@ -36,15 +39,19 @@ public class MatchService {
     private final PlayerProfileService playerProfileService;
     private final LocationService locationService;
     private final SlotService slotService;
+    private final EmailService emailService;
 
     @Autowired
-    public MatchService(MatchRepository matchRepository, AuthService authService, UserService userService, PlayerProfileService playerProfileService, LocationService locationService, SlotService slotService) {
+    public MatchService(MatchRepository matchRepository, AuthService authService, UserService userService,
+                        PlayerProfileService playerProfileService, LocationService locationService,
+                        SlotService slotService, EmailService emailService) {
         this.matchRepository = matchRepository;
         this.authService = authService;
         this.userService = userService;
         this.playerProfileService = playerProfileService;
         this.locationService = locationService;
         this.slotService = slotService;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -306,7 +313,17 @@ public class MatchService {
                     .build();
         }
 
+        //sending email
+        String organizerEmail = match.getOrganizer().getEmail();
+        String playerEmail = playerProfile.getUser().getEmail();
+        String matchName = match.getName();
 
+        try {
+            emailService.sendOrganizerOptOutNotification(organizerEmail, matchName);
+            emailService.sendPlayerOptOutNotification(playerEmail, matchName);
+        } catch (Exception e) {
+            log.error("Sending email error: {}", e.getMessage());
+        }
 
         //final step - removing Player from the slot
         //because of @Transactional no need of save() method
