@@ -1,12 +1,14 @@
 package pl.volleylove.antenka.event.match;
 
+import jakarta.mail.MessagingException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
-import org.springframework.validation.ObjectError;
 import pl.volleylove.antenka.entity.*;
 import pl.volleylove.antenka.enums.*;
 import pl.volleylove.antenka.event.AgeRange;
@@ -19,6 +21,7 @@ import pl.volleylove.antenka.event.match.optout.OptOutRequest;
 import pl.volleylove.antenka.event.match.optout.OptOutResponse;
 import pl.volleylove.antenka.event.match.signup.SignUpForMatchRequest;
 import pl.volleylove.antenka.event.match.signup.SignUpForMatchResponse;
+import pl.volleylove.antenka.mail.EmailService;
 import pl.volleylove.antenka.map.LocationService;
 import pl.volleylove.antenka.playerprofile.PlayerProfileService;
 import pl.volleylove.antenka.repository.MatchRepository;
@@ -44,21 +47,24 @@ import static pl.volleylove.antenka.enums.SignUpInfo.*;
 class MatchServiceTest {
 
     @Mock
-    private static MatchRepository matchRepository;
+    private MatchRepository matchRepository;
     @Mock
-    private static AuthService authService;
+    private AuthService authService;
     @Mock
-    private static UserService userService;
+    private UserService userService;
     @Mock
-    private static PlayerProfileService playerProfileService;
+    private PlayerProfileService playerProfileService;
     @Mock
-    private static LocationService locationService;
+    private LocationService locationService;
     @Mock
-    private static SlotService slotService;
+    private SlotService slotService;
     @Mock
-    private static Errors errors;
+    private EmailService emailService;
+
     @InjectMocks
-    private static MatchService matchService;
+    private MatchService matchService;
+
+    private Errors errors;
 
     private static final String PRICE = "10";
     private static final String ERROR_MSG_INCORRECT_ADDRESS = "Incorrect address";
@@ -68,26 +74,23 @@ class MatchServiceTest {
     private static final Long EVENT_ID = 1L;
     private static final Long PLAYER_PROFILE_ID_1 = 1L;
     private static final Long PLAYER_PROFILE_ID_2 = 2L;
-
     private static final int SLOT_ORDER_NUM_1 = 1;
     private static final int SLOT_ORDER_NUM_2 = 2;
     private static final int INCORRECT_SLOT_ORDER_NUM = 123456789;
     private static final int AGE = 18;
     private static final LocalDateTime DATE_TIME = LocalDateTime.now().plusDays(5);
-    private static final PlayerProfile PLAYER_PROFILE_BEGINNER = PlayerProfile.builder()
-            .playerProfileID(1L)
-            .level(BEGINNER)
-            .gender(FEMALE)
-            .age(AGE)
-            .positions(Set.of(LIBERO))
-            .build();
+    private static final String EMAIL = "test@test.com";
+
+    @BeforeEach
+    void setUp() {
+        errors = new BeanPropertyBindingResult(AddMatchRequest.builder().build(), "request");
+    }
 
     @Test
     void addTestAddMatchRequestHasErrors() throws IOException, InterruptedException {
 
-        when(errors.hasErrors()).thenReturn(true);
-        when(errors.getAllErrors()).thenReturn(List.of(new ObjectError("name: " + ERROR_MSG_INCORRECT_ADDRESS,
-                ERROR_MSG_INCORRECT_ADDRESS)));
+        errors = new BeanPropertyBindingResult(AddMatchRequest.builder().build(), "request");
+        errors.reject("address", ERROR_MSG_INCORRECT_ADDRESS);
 
         AddMatchResponse expectedResponse = AddMatchResponse
                 .builder()
@@ -102,7 +105,7 @@ class MatchServiceTest {
     @Test
     void addTestUserIsNotLoggedIn() throws IOException, InterruptedException {
 
-        when(userService.findByID(any(long.class))).thenReturn(Optional.empty());
+        errors = new BeanPropertyBindingResult(AddMatchRequest.builder().build(), "request");
 
         AddMatchResponse expectedResponse = AddMatchResponse
                 .builder()
@@ -115,11 +118,14 @@ class MatchServiceTest {
     @Test
     void addTestSuccess() throws IOException, InterruptedException {
 
+        errors = new BeanPropertyBindingResult(AddMatchRequest.builder().build(), "request");
+
         Match matchToAdd = Match.builder().name(MATCH_NAME).build();
 
-        when(userService.findByID(any(long.class))).thenReturn(Optional.of(new User()));
-        when(locationService.setLocationInAddress(any(Address.class))).thenReturn(new Address());
-        when(matchRepository.save(any(Match.class))).thenReturn(matchToAdd);
+        when(authService.getAuthenticatedUserID()).thenReturn(1L);
+        when(userService.findByID(any())).thenReturn(Optional.of(new User()));
+        when(locationService.setLocationInAddress(any())).thenReturn(new Address());
+        when(matchRepository.save(any())).thenReturn(matchToAdd);
 
         AddMatchResponse expectedResponse = AddMatchResponse
                 .builder()
@@ -152,10 +158,10 @@ class MatchServiceTest {
 
         when(playerProfileService.getPlayerProfileOfAuthenticatedUser())
                 .thenReturn(Optional.of(PlayerProfile.builder()
-                                .gender(FEMALE)
-                                .age(25)
-                                .level(BEGINNER)
-                                .positions(Set.of(Position.SETTER))
+                        .gender(FEMALE)
+                        .age(25)
+                        .level(BEGINNER)
+                        .positions(Set.of(Position.SETTER))
                         .activeBenefit(true)
                         .build()));
 
@@ -204,7 +210,7 @@ class MatchServiceTest {
     @Test
     void signUpForMatchTestUserNotLoggedIn() {
 
-        when(userService.findByID(any(long.class))).thenThrow(NoSuchElementException.class);
+        when(userService.findByID(anyLong())).thenThrow(NoSuchElementException.class);
 
         SignUpForMatchResponse expectedResponse = SignUpForMatchResponse.builder()
                 .info(YOU_ARE_NOT_LOGGED_IN)
@@ -353,7 +359,8 @@ class MatchServiceTest {
         verify(matchRepository, times(0)).save(any(Match.class));
     }
 
-    @Test //Match has empty Slots, but User tries to sign up for slot, which has player already
+    @Test
+        //Match has empty Slots, but User tries to sign up for slot, which has player already
     void signUpForMatchTestSlotHasPlayer() {
 
         when(userService.findByID(any(long.class))).thenReturn(Optional.of(new User()));
@@ -394,17 +401,18 @@ class MatchServiceTest {
         verify(matchRepository, times(0)).save(any(Match.class));
     }
 
-    @Test //Match has empty Slots, but User tries to sign up for slot, which has Player already
+    @Test
+        //Match has empty Slots, but User tries to sign up for slot, which has Player already
     void signUpForMatchTestPlayerIsSignedUpForThisMatch() {
 
         when(userService.findByID(any(long.class))).thenReturn(Optional.of(new User()));
-        when(playerProfileService.getPlayerProfile(any(User.class))).thenReturn(Optional.of(PLAYER_PROFILE_BEGINNER));
+        when(playerProfileService.getPlayerProfile(any(User.class))).thenReturn(Optional.of(getPlayerProfileBeginner()));
 
         when(matchRepository.findById(any(long.class))).thenAnswer(a -> {
 
             Slot slotWithPlayer = Slot.builder()
                     .orderNum(SLOT_ORDER_NUM_1)
-                    .playerApplied(PLAYER_PROFILE_BEGINNER)
+                    .playerApplied(getPlayerProfileBeginner())
                     .build();
 
             Slot slotWithoutPlayer = Slot.builder()
@@ -439,7 +447,7 @@ class MatchServiceTest {
     void signUpForMatchTestPlayerDoesNotMeetRequirements() {
 
         when(userService.findByID(any(long.class))).thenReturn(Optional.of(new User()));
-        when(playerProfileService.getPlayerProfile(any(User.class))).thenReturn(Optional.of(PLAYER_PROFILE_BEGINNER));
+        when(playerProfileService.getPlayerProfile(any(User.class))).thenReturn(Optional.of(getPlayerProfileBeginner()));
 
         when(matchRepository.findById(any(long.class))).thenAnswer(a -> {
 
@@ -472,11 +480,12 @@ class MatchServiceTest {
         verify(matchRepository, times(0)).save(any(Match.class));
     }
 
-    @Test //signed up is successful and after that 1 free slot left
+    @Test
+        //signed up is successful and after that 1 free slot left
     void signUpForMatchTestOkFreeSlotLeft() {
 
         when(userService.findByID(any(long.class))).thenReturn(Optional.of(new User()));
-        when(playerProfileService.getPlayerProfile(any(User.class))).thenReturn(Optional.of(PLAYER_PROFILE_BEGINNER));
+        when(playerProfileService.getPlayerProfile(any(User.class))).thenReturn(Optional.of(getPlayerProfileBeginner()));
 
         //slot to sign up
         Slot slot1 = Slot.builder()
@@ -534,11 +543,12 @@ class MatchServiceTest {
         verify(matchRepository, times(1)).save(any(Match.class));
     }
 
-    @Test //it's last free slot - Match's signingUp attribute should be false
+    @Test
+        //it's last free slot - Match's signingUp attribute should be false
     void signUpForMatchTestOkLastFreeSlot() {
 
         when(userService.findByID(any(long.class))).thenReturn(Optional.of(new User()));
-        when(playerProfileService.getPlayerProfile(any(User.class))).thenReturn(Optional.of(PLAYER_PROFILE_BEGINNER));
+        when(playerProfileService.getPlayerProfile(any(User.class))).thenReturn(Optional.of(getPlayerProfileBeginner()));
 
         Slot slot = Slot.builder()
                 .playerWanted(PlayerWanted.builder()
@@ -593,12 +603,15 @@ class MatchServiceTest {
 
         assertEquals(expectedResponse, matchService.optOut(optOutRequest));
     }
+
     @Test
     void optOutTestIncorrectSlotNumber() throws NotAuthenticatedException {
 
         when(matchRepository.findById(any(long.class))).thenAnswer(answer -> Optional.of(Match.builder()
                 .slots(Set.of(Slot.builder().orderNum(SLOT_ORDER_NUM_1).build()))
                 .eventID(EVENT_ID)
+                .dateTime(LocalDateTime.now().plusDays(5))
+                .isActive(true)
                 .build()));
 
         OptOutRequest optOutRequest = new OptOutRequest(EVENT_ID, SLOT_ORDER_NUM_2, OptOutReason.OTHER);
@@ -613,18 +626,15 @@ class MatchServiceTest {
         when(matchRepository.findById(any(long.class))).thenAnswer(answer -> Optional.of(Match.builder()
                 .slots(Set.of(Slot.builder().orderNum(SLOT_ORDER_NUM_1).build()))
                 .eventID(EVENT_ID)
+                .dateTime(LocalDateTime.now().plusDays(5))
+                .isActive(true)
                 .build()));
 
         when(playerProfileService.getPlayerProfileOfAuthenticatedUser()).thenThrow(NotAuthenticatedException.class);
 
         OptOutRequest optOutRequest = new OptOutRequest(EVENT_ID, SLOT_ORDER_NUM_1, OptOutReason.OTHER);
 
-        try {
-            matchService.optOut(optOutRequest);
-            fail("exception expected!");
-        } catch (NotAuthenticatedException e) {
-            assertEquals(NotAuthenticatedException.class, e.getClass());
-        }
+        assertThrows(NotAuthenticatedException.class, () -> matchService.optOut(optOutRequest));
 
         verify(matchRepository, times(1)).findById(any(long.class));
         verify(playerProfileService, times(1)).getPlayerProfileOfAuthenticatedUser();
@@ -638,6 +648,8 @@ class MatchServiceTest {
                         .orderNum(SLOT_ORDER_NUM_1)
                         .playerApplied(PlayerProfile.builder().playerProfileID(PLAYER_PROFILE_ID_1).build())
                         .build()))
+                .dateTime(LocalDateTime.now().plusDays(5))
+                .isActive(true)
                 .eventID(EVENT_ID)
                 .build()));
 
@@ -667,6 +679,8 @@ class MatchServiceTest {
                                 .playerApplied(PlayerProfile.builder().playerProfileID(PLAYER_PROFILE_ID_2).build())
                                 .build()))
                 .eventID(EVENT_ID)
+                .dateTime(LocalDateTime.now().plusDays(5))
+                .isActive(true)
                 .build()));
 
         when(playerProfileService.getPlayerProfileOfAuthenticatedUser())
@@ -700,24 +714,26 @@ class MatchServiceTest {
     }
 
     @Test
-    void optOutTestSuccess() throws NotAuthenticatedException {
+    void optOutTestSuccess() throws NotAuthenticatedException, MessagingException {
 
-        when(matchRepository.findById(any(long.class))).thenAnswer(answer -> Optional.of(Match.builder()
+        when(matchRepository.findById(any(Long.class))).thenAnswer(answer -> Optional.of(Match.builder()
                 .dateTime(LocalDateTime.now().plusDays(7))
                 .slots(Set.of(Slot.builder()
-                                .orderNum(SLOT_ORDER_NUM_1)
-                                .playerApplied(PlayerProfile.builder()
-                                        .playerProfileID(PLAYER_PROFILE_ID_1)
-                                        .user(User.builder().userID(1L).build())
-                                        .build())
-                                .build()))
+                        .orderNum(SLOT_ORDER_NUM_1)
+                        .playerApplied(PlayerProfile.builder()
+                                .playerProfileID(PLAYER_PROFILE_ID_1)
+                                .user(User.builder().userID(1L).build())
+                                .build())
+                        .build()))
+                .organizer(User.builder().email(EMAIL).build())
+                .name(MATCH_NAME)
                 .isActive(true)
                 .build()));
 
         when(playerProfileService.getPlayerProfileOfAuthenticatedUser())
                 .thenReturn(Optional.of(PlayerProfile.builder()
                         .playerProfileID(PLAYER_PROFILE_ID_1)
-                        .user(User.builder().userID(1L).build())
+                        .user(User.builder().userID(1L).email(EMAIL).build())
                         .build()));
 
         OptOutRequest optOutRequest = new OptOutRequest(EVENT_ID, SLOT_ORDER_NUM_1, OptOutReason.OTHER);
@@ -727,6 +743,19 @@ class MatchServiceTest {
 
         verify(matchRepository, times(1)).findById(any(long.class));
         verify(playerProfileService, times(1)).getPlayerProfileOfAuthenticatedUser();
+        verify(emailService, times(1)).sendPlayerOptOutNotification(any(String.class), any(String.class));
+        verify(emailService, times(1)).sendOrganizerOptOutNotification(any(String.class), any(String.class));
+    }
+
+    private PlayerProfile getPlayerProfileBeginner() {
+        return PlayerProfile.builder()
+                .playerProfileID(1L)
+                .level(BEGINNER)
+                .gender(FEMALE)
+                .age(AGE)
+                .positions(Set.of(LIBERO))
+                .user(new User())
+                .build();
     }
 
 }
